@@ -1,1 +1,1 @@
-# Assignment-1---Fast-Trajectory-Replanning
+# Assignment 1 - Fast-Trajectory-Replanning
