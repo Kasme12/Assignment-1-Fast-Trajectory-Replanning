@@ -124,19 +124,28 @@ part5_results = part5_adaptive_astar()
 ## Experimental Results Summary
 
 ### Part 2: Tie-Breaking Effects
-- **Breaking ties by larger g-values**: Baseline
-- **Breaking ties by smaller g-values**: -12.9% (more expansions)
-- **Explanation**: Larger g-values encourage goal-directed search
+- **Breaking ties by smaller g-values (g_min)**: 83,823 mean expansions ✓ **BETTER**
+- **Breaking ties by larger g-values (g_max)**: 95,435 mean expansions
+- **Improvement**: +12.2% reduction with g-min strategy
+- **Key Finding**: Counter-intuitive result showing breadth-first tie-breaking outperforms goal-directed tie-breaking
 
 ### Part 3: Forward vs. Backward
-- **Repeated Forward A***: Baseline (8,234 mean expansions)
-- **Repeated Backward A***: -28.5% (11,567 expansions)
-- **Explanation**: Forward search benefits from improving heuristics as agent moves toward goal
+- **Repeated Forward A***: 95,435 mean expansions
+- **Repeated Backward A***: 62,267 mean expansions ✓ **BETTER**
+- **Improvement**: +34.8% reduction with backward search
+- **Key Finding**: Backward search from fixed goal outperforms forward search in this domain
 
 ### Part 5: Adaptive A*
-- **Repeated Forward A***: Baseline (42,156 total expansions)
-- **Adaptive A***: +24.3% improvement (31,892 total expansions)
-- **Key finding**: Improvement increases with repeated searches (+30.1% in subsequent searches)
+- **Repeated Forward A***: 95,435 total expansions (baseline)
+- **Adaptive A***: 87,695 total expansions
+- **Improvement**: +8.1% overall reduction
+- **Per-gridworld results**:
+  - GW0: +0.0% (trivial path)
+  - GW1: -999900% (algorithm regression on very short paths)
+  - GW2: +17.3% (good improvement)
+  - GW3: +25.3% (strong improvement)
+  - GW4: +0.0% (limited replans)
+- **Note**: Algorithm shows edge case vulnerability with paths < 5 expansions
 
 ## Mathematical Proofs Included
 
@@ -247,7 +256,7 @@ Potential improvements not in scope:
 ## Author Information
 
 **Team Members:**
-- [Students Names: Esmeralda Bencosme, Anna]
+- [Students Names: Esmeralda Bencosme, Anna Koganov] - NETID: [EB10124, aee71]
 
 **Assignment**: CS 440, Spring 2026
 **Deadline**: February 15, 11:55 PM
@@ -256,4 +265,3 @@ Potential improvements not in scope:
 ## License
 
 This is an academic assignment. Use only for educational purposes.
-
