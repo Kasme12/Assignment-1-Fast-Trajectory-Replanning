@@ -247,7 +247,7 @@ Potential improvements not in scope:
 ## Author Information
 
 **Team Members:**
-- [Student Name] - RUID: [XXXXXXXXX]
+- [Students Names: Esmeralda Bencosme, Anna]
 
 **Assignment**: CS 440, Spring 2026
 **Deadline**: February 15, 11:55 PM
@@ -256,3 +256,4 @@ Potential improvements not in scope:
 ## License
 
 This is an academic assignment. Use only for educational purposes.
+
