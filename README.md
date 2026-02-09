@@ -247,7 +247,7 @@ Potential improvements not in scope:
 ## Author Information
 
 **Team Members:**
-- [Students Names: Esmeralda Bencosme, Anna]
+- [Students Names: Esmeralda Bencosme, Anna Koganov]
 
 **Assignment**: CS 440, Spring 2026
 **Deadline**: February 15, 11:55 PM
