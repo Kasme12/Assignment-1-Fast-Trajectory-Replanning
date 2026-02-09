@@ -11,8 +11,9 @@ import numpy as np
 from typing import List, Dict, Tuple
 import matplotlib.pyplot as plt
 
-# Add src to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add project root to path
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, project_root)
 
 from src.gridworld.gridworld import Gridworld, GridworldGenerator, save_gridworld, load_gridworld
 from src.algorithms.astar import RepeatedForwardAStar, RepeatedBackwardAStar, AdaptiveAStar
@@ -127,8 +128,8 @@ def part2_tie_breaking():
     print("PART 2: EFFECTS OF TIE-BREAKING")
     print("="*70)
     
-    # Load a subset of gridworlds
-    gridworlds = load_test_gridworlds(10)
+    # Load a subset of gridworlds (using first 5 for speed)
+    gridworlds = load_test_gridworlds(5)
     
     results = {
         'tie_break_g_max': [],
@@ -171,7 +172,7 @@ def part3_forward_vs_backward():
     print("PART 3: FORWARD VS BACKWARD A*")
     print("="*70)
     
-    gridworlds = load_test_gridworlds(10)
+    gridworlds = load_test_gridworlds(5)
     
     results = {
         'forward': [],
@@ -213,8 +214,9 @@ def part5_adaptive_astar():
     print("\n" + "="*70)
     print("PART 5: ADAPTIVE A*")
     print("="*70)
+    sys.stdout.flush()
     
-    gridworlds = load_test_gridworlds(10)
+    gridworlds = load_test_gridworlds(5)
     
     results = {
         'forward': [],
@@ -222,6 +224,7 @@ def part5_adaptive_astar():
     }
     
     for i, gw in enumerate(gridworlds):
+        sys.stdout.flush()
         start = (0, 0)
         goal = (gw.width - 1, gw.height - 1)
         
@@ -240,6 +243,7 @@ def part5_adaptive_astar():
         improvement = (total_exp_f - total_exp_a) / max(1, total_exp_f) * 100 if total_exp_f > 0 else 0
         
         print(f"Gridworld {i:3d}: Forward={total_exp_f:6d} | Adaptive={total_exp_a:6d} | Improvement={improvement:+5.1f}%")
+        sys.stdout.flush()
     
     stats_f = ExperimentAnalyzer.generate_statistics(results['forward'])
     stats_a = ExperimentAnalyzer.generate_statistics(results['adaptive'])
@@ -280,29 +284,37 @@ def main():
     results_p3 = part3_forward_vs_backward()
     
     # Part 5: Adaptive A*
+    print("\nRunning Part 5...", flush=True)
     results_p5 = part5_adaptive_astar()
     
     # Save results
+    print("\nPreparing to save results...", flush=True)
     all_results = {
         'part2_tiebreaking': results_p2,
         'part3_forward_backward': results_p3,
         'part5_adaptive': results_p5
     }
     
+    print("Converting results for JSON...", flush=True)
     with open("results/experiment_results.json", "w") as f:
         # Convert numpy types to Python types for JSON serialization
         json_results = {}
         for key, val in all_results.items():
-            json_results[key] = {
-                k: [
-
-{**v, 'expansions': int(v['expansions']), 'path_length': int(v['path_length']),
-                          'runtime': float(v['runtime'])}
-                    for v in vals]
-                for k, vals in val.items()
-            }
+            json_results[key] = {}
+            for k, vals in val.items():
+                json_results[key][k] = []
+                for v in vals:
+                    json_results[key][k].append({
+                        'expansions': int(v['expansions']),
+                        'path_length': int(v['path_length']),
+                        'runtime': float(v['runtime']),
+                        'algorithm': v['algorithm'],
+                        'path_found': v['path_found']
+                    })
         
+        print("Writing JSON...", flush=True)
         json.dump(json_results, f, indent=2)
+        print("JSON write complete.", flush=True)
     
     print("\n" + "="*70)
     print("EXPERIMENTS COMPLETED")

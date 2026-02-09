@@ -1,0 +1,230 @@
+{
+  "part2_tiebreaking": {
+    "tie_break_g_max": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 0.6057295799255371,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 2.5987625122070312e-05,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 149040,
+        "path_length": 2,
+        "runtime": 1.2686419486999512,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 169549,
+        "path_length": 2,
+        "runtime": 1.476362943649292,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 0.8159902095794678,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ],
+    "tie_break_g_min": [
+      {
+        "expansions": 64468,
+        "path_length": 2,
+        "runtime": 0.40726494789123535,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 1.4066696166992188e-05,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 121558,
+        "path_length": 2,
+        "runtime": 0.8536887168884277,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 141943,
+        "path_length": 2,
+        "runtime": 0.9907498359680176,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 91145,
+        "path_length": 2,
+        "runtime": 0.6833891868591309,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ]
+  },
+  "part3_forward_backward": {
+    "forward": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 0.6702244281768799,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 3.337860107421875e-05,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 149040,
+        "path_length": 2,
+        "runtime": 1.439650058746338,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 169549,
+        "path_length": 2,
+        "runtime": 1.6618235111236572,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 0.9526052474975586,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ],
+    "backward": [
+      {
+        "expansions": 45621,
+        "path_length": 2,
+        "runtime": 0.4309840202331543,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 8141,
+        "path_length": 0,
+        "runtime": 0.08045816421508789,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 95900,
+        "path_length": 2,
+        "runtime": 0.8733620643615723,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 93285,
+        "path_length": 2,
+        "runtime": 0.9051764011383057,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 68386,
+        "path_length": 2,
+        "runtime": 0.6918432712554932,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      }
+    ]
+  },
+  "part5_adaptive": {
+    "forward": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 0.6964371204376221,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 3.647804260253906e-05,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 149040,
+        "path_length": 2,
+        "runtime": 1.4457323551177979,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 169549,
+        "path_length": 2,
+        "runtime": 1.7014312744140625,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 1.0039246082305908,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ],
+    "adaptive": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 0.7620069980621338,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 30000,
+        "path_length": 2,
+        "runtime": 0.11824798583984375,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 123268,
+        "path_length": 2,
+        "runtime": 1.2840027809143066,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 126625,
+        "path_length": 2,
+        "runtime": 1.3954377174377441,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 0.9820120334625244,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      }
+    ]
+  }
+}

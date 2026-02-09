@@ -99,6 +99,11 @@ class AStarBase(SearchAlgorithm):
 class RepeatedForwardAStar(AStarBase):
     """Repeated Forward A* implementation."""
     
+    def __init__(self, gridworld: Gridworld, tie_break_g_max: bool = True):
+        """Initialize Repeated Forward A*."""
+        super().__init__(gridworld, tie_break_g_max)
+        self.max_replans = 10000  # Prevent infinite loops
+    
     def find_path(self, start: Tuple[int, int], goal: Tuple[int, int],
                   observations: Optional[Dict[Tuple[int, int], bool]] = None) -> Optional[List[Tuple[int, int]]]:
         """
@@ -119,8 +124,10 @@ class RepeatedForwardAStar(AStarBase):
             observations = {}
         
         current_state = start
+        replan_count = 0
         
-        while current_state != goal:
+        while current_state != goal and replan_count < self.max_replans:
+            replan_count += 1
             # Perform A* search
             path = self._compute_path(current_state, goal, observations)
             
@@ -396,10 +403,9 @@ class AdaptiveAStar(RepeatedForwardAStar):
         
         while not open_list.is_empty():
             min_f_in_open = open_list.heap[0][0] if not open_list.is_empty() else float('inf')
-            if self.tie_break_g_max:
-                f_min = min_f_in_open / 10000
-            else:
-                f_min = min_f_in_open / 10000
+            # Recover from priority encoding: priority = C*f(s) - g(s) where C is large
+            # So f_min ≈ priority / 10000 (since C=10000)
+            f_min = min_f_in_open / 10000
             
             g_goal = self._get_g_value(goal, self.counter)
             if g_goal <= f_min:
