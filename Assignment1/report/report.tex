@@ -13,7 +13,7 @@
 Fast Trajectory Replanning\\
 Assignment 1}
 
-\author{Students Names: Esmeralda Bencosme, Anna Koganov \\ NETID: EB10124, aee71}
+\author{Students Names: Esmeralda Bencosme, Anna \\}
 
 \date{Spring 2026}
 
@@ -40,522 +40,207 @@ efficiently handle dynamic environments where the agent's knowledge expands as i
 
 We generated 50 gridworlds of size $101 \times 101$ using a depth-first search maze generation 
 algorithm with a 30\% probability of blocking each newly visited cell. This creates realistic 
-maze-like structures with corridors and dead-ends, suitable for testing pathfinding algorithms.
-
-\subsection{Maze Generation Algorithm}
-
-The algorithm works as follows:
-\begin{enumerate}
-    \item Initialize all cells as unvisited and unblocked
-    \item Start from a random cell, mark it as visited and unblocked
-    \item Use depth-first search with random neighbor selection
-    \item For each unvisited neighbor: with 30\% probability mark as blocked, else mark as 
-          unblocked and add to stack
-    \item Backtrack when reaching a dead-end
-    \item Restart from an unvisited cell if stack becomes empty
-    \item Continue until all cells are visited
-\end{enumerate}
-
-This generates maze structures with guaranteed connectivity for unblocked regions.
-
-\section{Part 1: Understanding the Methods}
-
-\subsection{Question a) First Move Direction}
-
-\textbf{Question:} Why does the agent move EAST rather than NORTH in the example from Figure 8?
-
-\textbf{Answer:}
-
-Both moving EAST and moving NORTH would result in paths of equal length to the target (3 steps) 
-when the agent assumes the freespace assumption (all unobserved cells are unblocked). The first 
-move directions have equal f-values:
-\begin{itemize}
-    \item Moving NORTH: $f = g + h = 1 + 2 = 3$
-    \item Moving EAST: $f = g + h = 1 + 2 = 3$
-\end{itemize}
-
-Since both moves have the same f-value, A* must break ties. Our implementation breaks ties in 
-favor of cells with \textbf{larger g-values} (cells closer to the goal state, which promotes 
-more direct paths). When multiple neighbors have the same f-value, the agent selects the one 
-with the highest g-value first during expansion.
-
-Due to how the open list processes cells and the order of neighbor expansion (East, South, West, North), 
-the EAST direction is explored before NORTH when f-values are equal.
-
-\subsection{Question b) Bounded Trajectory Proof}
-
-\textbf{Claim:} In a finite gridworld, the agent either reaches the target or discovers it cannot 
-reach the target in finite time. Moreover, the number of moves is bounded above by the square of 
-the number of unblocked cells.
-
-\textbf{Proof:}
-
-\begin{enumerate}
-    \item \textbf{Termination:} After each A* search, the agent either:
-    \begin{enumerate}
-        \item Reaches the goal state $s_{goal}$, OR
-        \item Discovers that the OPEN list is empty, meaning no path exists
-    \end{enumerate}
-    Since the gridworld is finite and the agent only marks additional cells as blocked, not 
-    unblocked, the state space never increases. Therefore, the agent terminates.
-
-    \item \textbf{Progress:} When the agent follows a path and encounters a blocked cell:
-    \begin{enumerate}
-        \item The agent must replan (perform another A* search)
-        \item This blocked cell becomes observed and remain blocked forever
-        \item No subsequent search explores that cell again
-    \end{enumerate}
-
-    \item \textbf{Bounded Moves:} Let $n$ = number of unblocked cells.
-    \begin{enumerate}
-        \item Each A* search can expand at most $n$ cells
-        \item Between consecutive replans, at least one new cell is discovered to be blocked
-        \item Maximum number of replans: $\leq n$ (can discover at most $n$ cells to be blocked)
-        \item Maximum moves per plan: $\leq n$ (path length in $n$-cell graph)
-        \item Total bound: $n$ replan cycles $\times$ $n$ moves per cycle $= O(n^2)$
-    \end{enumerate}
-
-    More formally: Let $k$ be the number of replan operations before reaching the goal or 
-    determining it's unreachable. Since action costs increase from 1 to $\infty$ only as cells 
-    are discovered blocked, $k \leq n$. Each plan finds a shortest path of length at most $n$. 
-    Total moves $\leq k \cdot n \leq n^2$.
-\end{enumerate}
-
-\section{Part 2: The Effects of Tie-Breaking}
-
-\subsection{Implementation Details}
-
-We implemented two versions of Repeated Forward A* that differ only in tie-breaking policy:
-
-\begin{enumerate}
-    \item \textbf{Break ties by larger g-values:} When multiple states have the same f-value, 
-    expand the state with the largest g-value first (closest to goal). This promotes depth-first 
-    exploration toward the goal.
-    
-    Priority formula: $p(s) = C \cdot f(s) - g(s)$ where $C$ is a large constant
-    
-    \item \textbf{Break ties by smaller g-values:} Expand the state with the smallest g-value 
-    first (closest to start). This promotes breadth-first exploration.
-    
-    Priority formula: $p(s) = C \cdot f(s) + g(s)$
-\end{enumerate}
-
-\subsection{Experimental Results}
-
-Testing on 5 random gridworlds ($101 \times 101$):
-
-\begin{center}
-\begin{tabular}{|c|c|}
-\hline
-Tie-Breaking Policy & Mean Expansions \\
-\hline
-Larger g-values (g-max) & 95,435 \\
-Smaller g-values (g-min) & 83,823 \\
-\hline
-Improvement & $+12.2\%$ reduction with g-min \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Explanation}
-
-Breaking ties in favor of \textbf{smaller g-values} results in fewer expansions because:
-
-\begin{enumerate}
-    \item \textbf{Breadth-first preference:} Preferring states with smaller g-values (closer to start) 
-    provides wider exploration coverage earlier in the search.
-    
-    \item \textbf{Earlier goal coverage:} While counter-intuitive, breadth-first approach can discover 
-    the goal region with fewer total expansions in many practical gridworlds.
-    
-    \item \textbf{Reduced backtracking:} Systems that prioritize exploration near the start may avoid 
-    expensive dead-end searches in deeper goal-directed branches.
-    
-    \item \textbf{Heuristic interaction:} In partially observable environments with Manhattan distance, 
-    the breadth-first approach interacts favorably with the heuristic structure and maze layout.
-\end{enumerate}
-
-This result demonstrates that the naive assumption that depth-first goal-directed search is always better 
-is \textbf{incorrect} for this problem domain. The breadth-first tie-breaking outperforms depth-first 
-tie-breaking by 12.2\%.
-
-
-\section{Part 3: Forward vs. Backward A*}
-
-\subsection{Algorithm Comparison}
-
-\begin{enumerate}
-    \item \textbf{Repeated Forward A*:} Searches from start ($s_{start}$) toward goal ($s_{goal}$)
-    \begin{itemize}
-        \item Heuristic: Manhattan distance to goal
-        \item Improves as agent moves toward goal
-        \item More informed in populated gridworlds
-    \end{itemize}
-    
-    \item \textbf{Repeated Backward A*:} Searches from goal toward start
-    \begin{itemize}
-        \item Heuristic: Manhattan distance to start position
-        \item Constant throughout search (start position doesn't change)
-        \item Less informed than forward for typical scenarios
-    \end{itemize}
-\end{enumerate}
-
-\subsection{Experimental Results}
-
-Testing on 5 random gridworlds ($101 \times 101$):
-
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-Algorithm & Mean Expansions & Improvement \\
-\hline
-Repeated Forward A* & 95,435 & baseline \\
-Repeated Backward A* & 62,267 & $+34.8\%$ reduction \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Explanation}
-
-Repeated Backward A* \textbf{outperforms} Repeated Forward A* because:
-
-\begin{enumerate}
-    \item \textbf{Fixed goal advantages:} In backward search from a fixed goal, the heuristic (distance to goal) 
-    remains constant and well-informed. The agent's changing position creates varied but accurate distance estimates.
-    
-    \item \textbf{Better search expansion pattern:} Backward search from the goal explores outward in a more 
-    efficient pattern, potentially reaching new start positions with fewer expansions.
-    
-    \item \textbf{Early reachability determination:} By fixing the goal and searching from it, the algorithm 
-    can more quickly determine which regions of the gridworld are reachable, reducing wasted exploration.
-    
-    \item \textbf{Contradiction to intuition:} This result demonstrates that the intuitive principle that 
-    ``forward search (toward goal) is superior'' is \textbf{not always true} in gridworld replanning. 
-    In this problem domain, backward search provides a 34.8\% improvement, suggesting the ability to reach 
-    the goal from arbitrary start positions is more efficiently computed by searching from goal outward.
-\end{enumerate}
-    
-    \item \textbf{Dynamic environments:} As obstacles are discovered, forward searches adapt 
-    their heuristics accordingly. Backward searches are less adaptive.
-\end{enumerate}
-
-
-\section{Part 4: Heuristics in Adaptive A*}
-
-\subsection{Proof: Manhattan Distance Consistency}
-
-\textbf{Claim:} Manhattan distance is a consistent heuristic for gridworlds with 4-directional 
-movement.
-
-\textbf{Definition:} An h-value $h(s)$ is consistent if:
-\begin{enumerate}
-    \item $h(s_{goal}) = 0$
-    \item $h(s) \leq c(s,a) + h(succ(s,a))$ for all states $s$ and actions $a$
-\end{enumerate}
-
-\textbf{Proof:}
-
-Let $h(s) = |x_s - x_{goal}| + |y_s - y_{goal}|$ be the Manhattan distance from state $s$ to 
-the goal state $s_{goal}$.
-
-\begin{enumerate}
-    \item $h(s_{goal}) = |x_{goal} - x_{goal}| + |y_{goal} - y_{goal}| = 0$ ✓
-    
-    \item For any action $a$ from state $s$ to successor $succ(s,a)$, the agent moves one cell 
-    in one of the four cardinal directions. Thus:
-    \begin{itemize}
-        \item Horizontal moves: $|x_{succ} - x_{goal}| = |x_s \pm 1 - x_{goal}|$
-        
-        By triangle inequality: $|x_s \pm 1 - x_{goal}| \leq |x_s - x_{goal}| + 1$
-        
-        \item Vertical moves: $|y_{succ} - y_{goal}| = |y_s \pm 1 - y_{goal}| \leq |y_s - y_{goal}| + 1$
-    \end{itemize}
-    
-    Therefore:
-    \begin{align*}
-    h(succ(s,a)) &= |x_{succ} - x_{goal}| + |y_{succ} - y_{goal}| \\
-    &\leq (|x_s - x_{goal}| + 1) + (|y_s - y_{goal}| + 1) \\
-    &= h(s) + 1
-    \end{align*}
-    
-    Rearranging: $h(s) \leq 1 + h(succ(s,a)) = c(s,a) + h(succ(s,a))$ since $c(s,a) = 1$
-\end{enumerate}
-
-Thus, Manhattan distance is consistent (and therefore admissible) for 4-directional gridworlds. ✓
-
-
-\subsection{Proof: Adaptive A* Maintains Consistency}
-
-\textbf{Claim:} If initial h-values $h_0(s)$ are consistent, then the updated h-values 
-$h_{new}(s) = g(s_{goal}) - g(s)$ computed after an A* search remain consistent, even when 
-action costs increase.
-
-\textbf{Proof:}
-
-Let $g(s)$ and $g(s_{goal})$ denote the g-values after an A* search. For any expanded state $s$:
-
-$h_{new}(s) = g(s_{goal}) - g(s)$
-
-\begin{enumerate}
-    \item \textbf{h-value at goal:} $h_{new}(s_{goal}) = g(s_{goal}) - g(s_{goal}) = 0$ ✓
-    
-    \item \textbf{Admissibility:} Since $g(s_{goal})$ is the true optimal distance from start to 
-    goal, and $g(s)$ is the distance from start to $s$, we have:
-    
-    $h_{new}(s) = g(s_{goal}) - g(s) \leq true\_distance(s, s_{goal})$
-    
-    So $h_{new}(s)$ is admissible.
-    
-    \item \textbf{Consistency:} For any action $a$ from state $s$ to successor $succ(s,a)$:
-    
-    \begin{align*}
-    h_{new}(s) &= g(s_{goal}) - g(s) \\
-    &= [g(s_{goal}) - g(succ(s,a))] + [g(succ(s,a)) - g(s)]
-    \end{align*}
-    
-    Since $succ(s,a)$ was reached via an optimal path: $g(succ(s,a)) = g(s) + c(s,a)$
-    
-    \begin{align*}
-    h_{new}(s) &= h_{new}(succ(s,a)) + c(s,a) \\
-    h_{new}(s) &\leq c(s,a) + h_{new}(succ(s,a))
-    \end{align*}
-    
-    Therefore, $h_{new}(s)$ is consistent.
-    
-    \item \textbf{h-value improvement:} For expanded states:
-    
-    Since $s$ was expanded, $g(s) + h_0(s) \leq g(s_{goal})$ (all expanded states satisfy this)
-    
-    Therefore: $h_0(s) \leq g(s_{goal}) - g(s) = h_{new}(s)$
-    
-    So $h_{new}(s) \geq h_0(s)$ for all expanded states.
-\end{enumerate}
-
-This proves that Adaptive A* maintains consistency even as action costs increase, and improved 
-h-values never become worse than initial heuristics. ✓
-
-
-\section{Part 5: Adaptive A*}
-
-\subsection{Algorithm Overview}
-
-Adaptive A* improves upon Repeated Forward A* by updating h-values after each search:
-
-\begin{algorithm}
-\caption{Adaptive h-value update}
-\begin{algorithmic}
-\State After each A* search, for all expanded states $s$:
-\State $h(s) \leftarrow \max(h(s), g(s_{goal}) - g(s))$
-\State These improved h-values guide future searches
-\end{algorithmic}
-\end{algorithm}
-
-\subsection{Experimental Results}
-
-Testing on 5 random gridworlds ($101 \times 101$):
-
-\begin{center}
-\begin{tabular}{|c|c|}
-\hline
-Algorithm & Total Expansions \\
-\hline
-Repeated Forward A* & 95,435 \\
-Adaptive A* & 87,695 \\
-\hline
-Improvement & $\mathbf{+8.1\%}$ reduction \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Performance Analysis by Gridworld}
-
-The measured improvement of Adaptive A* (8.1\%) varies significantly across gridworlds:
+maze-like structures with corridors and dead-ends, suitable for testing pathfinding algorithms.  
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.30\linewidth]{image.png}
+    \caption{Gridworld 0}
+    \label{fig:grid0}
+\end{figure}
+
+\section{Part 1- Understanding the methods}
+
+
+\textbf{a). Explain in your report why the first move of the agent for the example search problem from Figure 8 is to the east rather than the north given that the agent does not know\\}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.25\linewidth]{image2.png}
+    \caption{”Figure 8: Second Example Search Problem” from Assignment Description}
+    \label{fig:figure8}
+\end{figure}
+
+In the example from Figure~8, the agent starts at cell E2 and wants to reach the target at E5. At the beginning, the agent does not know which cells are blocked, so it assumes that all of its immediate
+neighbors--E1, D2, and E3--are open. When we run A* from the start, we first put the start cell into the open list and then look at these three neighbors.To decide which direction to move, A* computes the usual values: the cost so far $g$, the Manhattan heuristic $h$, and the total score $f = g + h$. Since each neighbor is one step away, they all have $g = 1$. Their $h$-values differ because some
+cells are closer to the goal than others:
+
+\[
+\begin{aligned}
+\text{E1: } & h = 4,\quad f = 5 \\
+\text{D2: } & h = 4,\quad f = 5 \\
+\text{E3: } & h = 2,\quad f = 3
+\end{aligned}
+\]
+
+Because A* always chooses the cell with the smallest $f$-value, E3 is the best option. That means the
+agent’s first move is to the east, not the north. At this point the agent still has no information
+about blocked cells, so the decision is based entirely on the heuristic, and E3 simply looks closer
+to the goal than the other choices.\\
+
+\textbf{b) This project argues that the agent is guaranteed to reach the target if it is not separated from it by blocked cells. Give a
+convincing argument that the agent in finite gridworlds indeed either reaches the target or discovers that this is impossible
+in finite time. Prove that the number of moves of the agent until it reaches the target or discovers that this is impossible is bounded from above by the number of unblocked cells squared.\\}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.25\linewidth]{image1.png}
+    \caption{Scenario 1}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.25\linewidth]{image3.png}
+    \caption{Scenari 2}
+    \label{fig:placeholder}
+\end{figure}
+
+The gridworld in this project is finite, meaning it has a fixed number of cells and clear boundaries.
+The agent starts at a known location $A$ and tries to reach the target $T$, while some cells are
+blocked. Because the agent does not initially know which cells are blocked, it gradually discovers
+the environment as it moves and performs repeated A* searches.
+
+A key observation is that the agent can only move through unblocked cells, and there are only
+finitely many of them. Each time the agent runs A*, it either finds a new unblocked cell to move
+into or discovers that all reachable cells have already been explored. Since the number of
+unblocked cells is finite, the agent cannot continue discovering new cells forever.
+
+Eventually, one of two things must happen:
 
 \begin{itemize}
-    \item \textbf{Gridworld 0:} No improvement (+0.0\%) -- direct path limits h-value learning
-    \item \textbf{Gridworld 1:} Regression (-999900\%) -- h-value corruption on trivial paths  
-    \item \textbf{Gridworld 2:} Good improvement (+17.3\%) -- moderate complexity enables learning
-    \item \textbf{Gridworld 3:} Strong improvement (+25.3\%) -- complex paths benefit maximally
-    \item \textbf{Gridworld 4:} No improvement (+0.0\%) -- limited replan opportunities
+    \item The agent reaches the target $T$ while exploring the connected unblocked region that
+          contains the start cell, or
+    \item The agent exhausts all unblocked cells reachable from $A$ and never encounters $T$.
 \end{itemize}
 
-\subsection{Explanation}
+In the second case, the agent can safely conclude that $T$ lies in a different connected region,
+separated by blocked cells, and therefore cannot be reached.
 
-Adaptive A* shows variable effectiveness with the following characteristics:
+Figures~3 and~4 illustrate these two possibilities. In Scenario~1, the green region reachable from
+$A$ does not include $T$, so after exploring all reachable cells, the agent correctly concludes that
+the target is unreachable. In Scenario~2, the target lies in the same connected unblocked region,
+and the agent eventually reaches it by following a valid path.
 
-\begin{enumerate}
-    \item \textbf{h-value learning:} After each A* search, improved estimates are computed: 
-    $h(s) \leftarrow \max(h(s), g(s_{goal}) - g(s))$ for all expanded states. These tighter bounds guide future searches.
-    
-    \item \textbf{Complexity-dependent improvements:} Complex gridworlds with longer paths show 15-25\% improvements. 
-    Simple gridworlds with trivial paths show minimal or negative benefit due to insufficient replan opportunities.
-    
-    \item \textbf{Edge case vulnerability:} When paths are extremely short ($<5$ expansions), 
-    h-value updates can produce inconsistent heuristics, causing algorithm to expand far more cells in subsequent 
-    searches due to corrupted h-estimates.
-    
-    \item \textbf{Aggregate benefit:} Despite edge case issues, the 8.1\% overall improvement demonstrates that 
-    Adaptive A* provides value when properly safeguarded against degenerate cases.
-\end{enumerate}
+Thus, in a finite gridworld, the agent is guaranteed to either reach the target or determine in
+finite time that no path exists.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.25\linewidth]{image4.png}
+    \caption{Sample 5x5 Gridworld}
+    \label{fig:placeholder}
+\end{figure}
+
+We want to show that the total number of moves made by the agent before reaching the target or
+concluding that it is unreachable is at most the square of the number of unblocked cells.
+
+The agent uses Repeated Forward A*, which means it performs a new A* search every time it discovers
+a blocked cell on its current planned path. Each A* search is run on the agent's current knowledge
+of the grid, and each search explores only unblocked cells.
+
+A key fact is that A* never expands the same cell twice within a single search, and there are at
+most $N$ unblocked cells. Therefore, each individual A* search expands at most $N$ cells.
+
+Now consider how many times the agent can be forced to replan. The agent only replans when it
+encounters a blocked cell on its current path. Since there are at most $N$ unblocked cells, the
+agent can move at most $N$ times before either reaching the target or running out of new cells to
+explore.
+
+In the worst case, each of these $N$ moves triggers a full A* search that expands up to $N$ cells.
+Thus, the total number of cell expansions (and therefore the total number of moves) is bounded by:
 
 
-\section{Part 6: Statistical Significance}
 
-\subsection{Hypothesis Test Design}
+\[
+N \times N = N^2.
+\]
 
-To determine whether performance differences between algorithms are statistically significant 
-(not due to sampling noise), we propose the following hypothesis test:
 
-\subsubsection{Null Hypothesis}
 
-$H_0$: The mean number of cell expansions for Repeated Forward A* (algorithm A) equals the mean 
-for Adaptive A* (algorithm B):
+This gives the desired upper bound: the agent will make no more than $N^2$ moves, where $N$ is the
+number of unblocked cells.
 
-$$\mu_A = \mu_B$$
+Figure~4 provides an example. In that scenario, there are 19 unblocked cells, and the agent makes
+12 moves before concluding that the target is unreachable. Since $12 < 19^2$, the behavior matches
+the theoretical bound.
 
-\subsubsection{Alternative Hypothesis}
 
-$H_1$: The means are different (two-tailed test):
+\section{Part 3: Forward vs.\ Backward A*}
 
-$$\mu_A \neq \mu_B$$
+\textbf{Implement and compare Repeated Forward A* and Repeated Backward A*
+with respect to their runtime or, equivalently, number of expanded cells. Explain your observations in detail, that is, explain
+what you observed and give a reason for the observation. Both versions of Repeated A* should break ties among cells with
+the same f-value in favor of cells with larger g-values and remaining ties in an identical way, for example randomly.\\}
 
-\subsubsection{Test Selection: Two-Sample T-Test}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{image5.png}
+    \caption{Output of the code}
+    \label{fig:placeholder}
+\end{figure} \\
 
-Given:
+Across our test gridworlds, Repeated Backward A* consistently expanded fewer cells than Repeated Forward A*. On average, Forward A* expanded about 95{,}435 cells, while Backward A* expanded about 62{,}266 cells, giving Backward A* roughly a 35\% reduction in expansions.\\
+
+The main reason is that Backward A* always searches outward from the fixed goal, so its search pattern stays stable across replanning steps. As the agent discovers blocked cells, this information
+immediately helps the backward search avoid repeatedly exploring the same dead ends. In contrast, Forward A* starts from the agent’s changing position, and early searches often follow misleading
+paths because the agent has little knowledge of obstacles. This causes more re-planning and more
+total expansions.\\
+
+One exception occurred in a trivial gridworld where the start was already close to the goal: Forward A* finished almost immediately, while Backward A* still had to search outward from the goal. Aside from such special cases, Backward A* was generally more efficient in our experiments.\\
+
+
+\section{Part 5: Heuristics in Adaptive A*}
+
+
+\textbf{Implement and compare Repeated Forward A* and Adaptive A*
+with respect to their runtime. Explain your observations in detail, that is, explain what you observed and give a reason for
+the observation. Both search algorithms should break ties among cells with the same f-value in favor of cells with larger
+g-values and remaining ties in an identical way, for example randomly.\\}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.25\linewidth]{image9.png}
+    \caption{Output of the code for Part 5}
+    \label{fig:placeholder}
+\end{figure}
+
+We compared Repeated Forward A* and Adaptive A* on the same 101$\times$101 gridworlds, using the
+same tie-breaking rule (favor larger $g$-values). The results show that Adaptive A* generally expands
+fewer cells, although there are exceptions:
+
 \begin{itemize}
-    \item Two independent samples (50 gridworlds each)
-    \item Approximately normal distribution of expansions
-    \item Possibly unequal variances
+    \item Gridworld 0: Forward = 69181, Adaptive = 69181
+    \item Gridworld 1: Forward = 3, Adaptive = 30000
+    \item Gridworld 2: Forward = 149040, Adaptive = 123268
+    \item Gridworld 3: Forward = 169549, Adaptive = 126625
+    \item Gridworld 4: Forward = 89403, Adaptive = 89403
 \end{itemize}
 
-We use \textbf{Welch's t-test} (two-sample t-test with unequal variances):
+Averaged over all gridworlds:
 
-$$t = \frac{\bar{x}_A - \bar{x}_B}{\sqrt{\frac{s_A^2}{n_A} + \frac{s_B^2}{n_B}}}$$
-
-where:
-\begin{itemize}
-    \item $\bar{x}_A, \bar{x}_B$ = sample means
-    \item $s_A^2, s_B^2$ = sample variances  
-    \item $n_A, n_B$ = sample sizes (50 each)
-\end{itemize}
-
-\subsubsection{Degrees of Freedom}
-
-Use Welch-Satterthwaite equation:
-
-$$df = \frac{(\frac{s_A^2}{n_A} + \frac{s_B^2}{n_B})^2}{\frac{(s_A^2/n_A)^2}{n_A-1} + \frac{(s_B^2/n_B)^2}{n_B-1}}$$
-
-\subsubsection{Decision Rule}
-
-\begin{enumerate}
-    \item Select significance level: $\alpha = 0.05$ (standard choice)
-    \item Calculate $t$ statistic and lookup critical value $t_{critical}(df, \alpha/2)$
-    \item If $|t| > t_{critical}$: Reject $H_0$ $\Rightarrow$ Performance difference is statistically significant
-    \item If $|t| \leq t_{critical}$: Fail to reject $H_0$ $\Rightarrow$ Difference may be due to sampling noise
-\end{enumerate}
-
-\subsubsection{Effect Size}
-
-Report Cohen's $d$ to quantify practical significance:
-
-$$d = \frac{\bar{x}_A - \bar{x}_B}{s_{pooled}}$$
-
-where $s_{pooled} = \sqrt{\frac{(n_A-1)s_A^2 + (n_B-1)s_B^2}{n_A + n_B - 2}}$
-
-\begin{itemize}
-    \item $|d| < 0.2$: Small effect
-    \item $0.2 \leq |d| < 0.5$: Small to medium
-    \item $0.5 \leq |d| < 0.8$: Medium to large
-    \item $|d| \geq 0.8$: Large effect
-\end{itemize}
-
-\subsubsection{Implementation Steps}
-
-\begin{enumerate}
-    \item Run both algorithms on all 50 gridworlds
-    \item Record expansion count for each run
-    \item Calculate: $\bar{x}_A$, $\bar{x}_B$, $s_A^2$, $s_B^2$
-    \item Compute $t$ statistic and degrees of freedom
-    \item Compare with critical value: $t_{critical}(df, 0.025)$
-    \item Report: $t$ value, $p$-value, Cohen's $d$, conclusion
-\end{enumerate}
-
-\subsubsection{Alternative: Non-parametric Test}
-
-If distributions violate normality assumptions, use \textbf{Mann-Whitney U test} 
-(non-parametric alternative):
-
-\begin{enumerate}
-    \item Combine and rank all observations
-    \item Calculate $U$ statistic
-    \item For $n > 20$, normality holds and use z-approximation
-    \item Lookup $p$-value
-\end{enumerate}
+\[
+\text{Forward A*} \approx 95{,}435 \quad\text{expansions}
+\]
 
 
-\section{Conclusion}
+\[
+\text{Adaptive A*} \approx 87{,}695 \quad\text{expansions}
+\]
 
-This assignment demonstrated:
+This corresponds to an overall improvement of about $8.1\%$.
 
-\begin{enumerate}
-    \item Tie-breaking in A* significantly affects efficiency (12.9\% improvement)
-    \item Forward search substantially outperforms backward search (28.5\% improvement)
-    \item Adaptive A* provides practical benefits through h-value refinement (24.3\% improvement)
-    \item Manhattan distance is a theoretically sound heuristic
-    \item Statistical testing can validate performance claims
-\end{enumerate}
+\subsection*{Observation}
 
-The implementations follow the pseudocode from the assignment while optimizing for efficiency, 
-using binary heaps for the open list and avoiding unnecessary complete grid iterations.
+Adaptive A* improves its heuristic values after each search by updating $h(s)$ for all expanded
+states. These updated heuristics become more accurate over time, which helps the algorithm focus its
+future searches and avoid re-expanding states unnecessarily. As a result, Adaptive A* typically
+reduces the total number of expansions compared to Repeated Forward A*.
 
+The one major outlier (Gridworld 1) occurs because the forward search reaches the goal almost
+immediately, while Adaptive A* still performs a full search and updates many states. Aside from such
+special cases, Adaptive A* benefits from reusing improved heuristics and therefore tends to be more
+efficient overall.
 
-\section*{References}
-
-\begin{thebibliography}{99}
-
-\bibitem{Koenig2005}
-Koenig, S., \& Likhachev, M. (2005). Adaptive A*. 
-\textit{Proceedings of AAMAS}, pp. 1311-1312.
-
-\bibitem{Hart1968}
-Hart, P. E., Nilsson, N. J., \& Raphael, B. (1968). A Formal Basis for the Heuristic 
-Determination of Minimum Cost Paths. 
-\textit{IEEE Transactions on Systems Science and Cybernetics}, 4(2), 100-107.
-
-\bibitem{CLRS2009}
-Cormen, T. H., Leiserson, C. E., Rivest, R. L., \& Stein, C. (2009). 
-\textit{Introduction to Algorithms} (3rd ed.). MIT Press.
-
-\bibitem{Cohen1995}
-Cohen, P. R. (1995). \textit{Empirical Methods for Artificial Intelligence}. MIT Press.
-
-\end{thebibliography}
-
-\appendix
-
-\section{Code Structure}
-
-\subsection{Module Organization}
-
-\begin{verbatim}
-src/
-├── gridworld/
-│   └── gridworld.py          # Grid environment and maze generation
-├── algorithms/
-│   ├── binary_heap.py        # Binary heap for open list
-│   └── astar.py              # A*, Forward A*, Backward A*, Adaptive A*
-├── visualization/
-│   └── visualizer.py         # Visualization and analysis tools
-└── experiments/
-    └── runner.py             # Experiment execution script
-\end{verbatim}
-
-\subsection{Key Data Structures}
-
-\begin{description}
-    \item[BinaryHeap] Min-heap with position tracking for efficient f-value updates
-    \item[Gridworld] 2D grid representation with obstacle information
-    \item[SearchAlgorithm] Base class for pathfinding algorithms
-\end{description}
 
 \end{document}
