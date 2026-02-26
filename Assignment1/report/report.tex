@@ -13,7 +13,7 @@
 Fast Trajectory Replanning\\
 Assignment 1}
 
-\author{Students Names: Esmeralda Bencosme, Anna \\}
+\author{Students Names: Esmeralda Bencosme, Anna Koganov\}
 
 \date{Spring 2026}
 
@@ -165,6 +165,32 @@ Figure~4 provides an example. In that scenario, there are 19 unblocked cells, an
 12 moves before concluding that the target is unreachable. Since $12 < 19^2$, the behavior matches
 the theoretical bound.
 
+\section{Part 2: The Effects of Ties}
+
+\textbf{Repeated Forward A* needs to break ties to decide which cell to expand next if several cells have the same smallest f-value. It can either break ties in favor of cells with smaller g-values or in favor of cells with larger g-values. Implement and compare both versions of Repeated Forward A* with respect to their runtime or, equivalently, number of expanded cells. Explain your observations in detail, that is, explain what you observed and give a reason for the observation.
+}
+
+\textbf{Algorithm Statistics:}
+
+Forward A* (break ties by gMax):
+
+   Total Expansions: 95435.2
+   
+   Path Length: N/A
+
+Forward A* (break ties by gMin):
+
+
+  Total Expansions: 83823.4
+  
+  Path Length: N/A
+  \textbf{\\Improvement:}
+  \\Forward A* (break ties by gMin): $+12.2\%$ reduction in expansions
+
+Observation: Breaking ties in favor of larger g-values typically results in fewer expansions because it prioritizes moving toward the goal, since the larger g values mean moving closer to the goal. Since the smaller g value moves closer to the start, it causes more nodes to be expanded, thus increasing the runtime. The minimum value tiebreaking method will still end up finding the optimal solution, as it expands more options, but it will do so in a less efficient manner, as shown in the algorithm results.
+  
+
+  
 
 \section{Part 3: Forward vs.\ Backward A*}
 
@@ -188,6 +214,23 @@ paths because the agent has little knowledge of obstacles. This causes more re-p
 total expansions.\\
 
 One exception occurred in a trivial gridworld where the start was already close to the goal: Forward A* finished almost immediately, while Backward A* still had to search outward from the goal. Aside from such special cases, Backward A* was generally more efficient in our experiments.\\
+
+\section{Part 4: Heuristics in the Adaptive A*}
+
+
+\textbf{The project argues that “the Manhattan distances are consistent in gridworlds in which the agent can move only in the four main compass directions.” Prove that this is indeed the case.}
+
+\textbf{Furthermore, it is argued that “The h-values $h_{new}(s) ...$ are not only admissible but also consistent.” Prove that Adaptive A* leaves initially consistent h-values consistent even if action costs can increase.}
+
+\textbf{Proof: Manhattan distances are consistent:\\}
+A consistent heuristic is one that never overestimates the cost to reach the goal state from the starting state. It satisfies the condition:\\
+$h(n)\leq c(n,n')+h(n')$\\This means the estimated distance from 
+ to the goal cannot be greater than the distance to a neighbor plus the estimated distance from that neighbor to the goal.
+ In a situation where you can only move in the cardinal directions, the shortest possible path is the Manhattan distance, i.e. the sum of vertical and horizontal steps needed to reach the goal state from the starting state. Additionally, all steps have equal costs, meaning that you cannot save costs by taking a longer path. Because of this, it is impossible for the Manhattan distance to overestimate the cost to reach the goal state from the starting state. If there exists a lower cost solution, it would have to have a smaller distance, and since it would be the minumum distance it would be the Manhattan distance, making it a consisten heuristic.
+ 
+ \textbf{Proof: Adaptive A* leaves initially consistent h-values consistent even if action costs can increase.\\}
+ Adaptive A* will have consistent h-values even if action costs can increase because the h value will still be the raw manhattan distance to the end goal from the current state. Since this is unaffected by step costs, it can never overestimate the costs as it gives the best possible solution and assumes all steps have equal value.
+ 
 
 
 \section{Part 5: Heuristics in Adaptive A*}
@@ -242,5 +285,20 @@ immediately, while Adaptive A* still performs a full search and updates many sta
 special cases, Adaptive A* benefits from reusing improved heuristics and therefore tends to be more
 efficient overall.
 
+\section{Part 6: Statistical Significance\\}
+\textbf{Performance differences between two search algorithms can be systematic in nature or only due to sampling noise (= bias exhibited by the selected test cases since the number of test cases is always
+limited). One can use statistical hypothesis tests to determine whether they are systematic in nature. Read up on statistical hypothesis tests (for example, in Cohen, Empirical Methods for Artificial Intelligence, MIT Press, 1995) and then describe for one of the experimental questions above exactly how a statistical hypothesis test could be performed. You do not need
+to implement anything for this question, you should only precisely describe how such a test could be performed.\\}
+
+One way to compare the two algorithms to find systemic differences is by running a paired t-test, with the procedure as follows:
+\begin{enumerate}
+    \item Prepare a set of many (n) test environments
+    \item Define null hypothesis: Differences in algorithm runtime are die to sampling noise
+    \item Run the tests with the two algorithms in as identical environments as possible and collect runtime results
+    \item Calculate the differences in runtime for the algorithms for each test.
+    \item Calculate test statistic t using formula $t = \frac{\bar{d}}{s_d / \sqrt{n}}$
+    \item Evaluate P-value: Compare the calculated t-statistic to the t-distribution with $n-1$ degrees of freedom to determine the p-value.
+    \item If p-value $<0.05$ (or desired significance level), reject the null hypothesis and conclude that the difference in performance is systematic and statistically significant.
+\end{enumerate}
 
 \end{document}

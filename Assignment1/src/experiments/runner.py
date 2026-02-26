@@ -96,31 +96,6 @@ def part0_setup_environments():
     print("Sample gridworld visualizations saved to data/visualizations/")
 
 
-def part1_understanding():
-    """Part 1: Understanding the methods (theoretical)."""
-    print("\n" + "="*70)
-    print("PART 1: UNDERSTANDING THE METHODS")
-    print("="*70)
-    
-    print("""
-This part is theoretical and should be addressed in the report.
-
-a) First move to the EAST (rather than NORTH):
-   - The agent uses the freespace assumption: assumes all unobserved cells are unblocked
-   - Manhattan distances are: 
-     * North to target: 3 moves
-     * East to target: 3 moves  
-   - Both directions result in same h-value, but A* breaks ties in favor of states
-     with larger g-values (in our implementation)
-   - When the agent moves EAST first, it explores a different path due to tie-breaking
-
-b) Bounded trajectory:
-   - The agent performs repeated A* searches, each finding shortest paths
-   - Maximum moves = (number of unblocked cells)^2
-   - This is because: in worst case, the agent might need to re-plan for each unblocked cell
-     and each re-plan might traverse all other cells
-""")
-
 
 def part2_tie_breaking():
     """Part 2: Effects of tie-breaking."""
@@ -274,9 +249,7 @@ def main():
     # Part 0: Setup
     part0_setup_environments()
     
-    # Part 1: Understanding
-    part1_understanding()
-    
+
     # Part 2: Tie-breaking
     results_p2 = part2_tie_breaking()
     

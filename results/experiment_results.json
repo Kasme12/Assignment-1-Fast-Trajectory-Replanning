@@ -1,0 +1,230 @@
+{
+  "part2_tiebreaking": {
+    "tie_break_g_max": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 2.1456522941589355,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 6.747245788574219e-05,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 149040,
+        "path_length": 2,
+        "runtime": 4.170321702957153,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 169549,
+        "path_length": 2,
+        "runtime": 4.743169546127319,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 2.913174629211426,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ],
+    "tie_break_g_min": [
+      {
+        "expansions": 64468,
+        "path_length": 2,
+        "runtime": 1.663010835647583,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 5.1021575927734375e-05,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 121558,
+        "path_length": 2,
+        "runtime": 2.935410737991333,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 141943,
+        "path_length": 2,
+        "runtime": 3.3825016021728516,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 91145,
+        "path_length": 2,
+        "runtime": 2.2148427963256836,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ]
+  },
+  "part3_forward_backward": {
+    "forward": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 2.251533269882202,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 9.775161743164062e-05,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 149040,
+        "path_length": 2,
+        "runtime": 4.969145059585571,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 169549,
+        "path_length": 2,
+        "runtime": 5.39877986907959,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 2.8933584690093994,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ],
+    "backward": [
+      {
+        "expansions": 45621,
+        "path_length": 2,
+        "runtime": 1.617497444152832,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 8141,
+        "path_length": 0,
+        "runtime": 0.1710221767425537,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 95900,
+        "path_length": 2,
+        "runtime": 3.356724977493286,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 93285,
+        "path_length": 2,
+        "runtime": 3.1296310424804688,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 68386,
+        "path_length": 2,
+        "runtime": 2.43644380569458,
+        "algorithm": "RepeatedBackwardAStar",
+        "path_found": true
+      }
+    ]
+  },
+  "part5_adaptive": {
+    "forward": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 2.0736398696899414,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 3,
+        "path_length": 0,
+        "runtime": 0.0001049041748046875,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": false
+      },
+      {
+        "expansions": 149040,
+        "path_length": 2,
+        "runtime": 4.8243279457092285,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 169549,
+        "path_length": 2,
+        "runtime": 5.554138422012329,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 3.0901012420654297,
+        "algorithm": "RepeatedForwardAStar",
+        "path_found": true
+      }
+    ],
+    "adaptive": [
+      {
+        "expansions": 69181,
+        "path_length": 2,
+        "runtime": 2.4980838298797607,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 30000,
+        "path_length": 2,
+        "runtime": 0.36901092529296875,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 123268,
+        "path_length": 2,
+        "runtime": 4.8008410930633545,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 126625,
+        "path_length": 2,
+        "runtime": 5.035819053649902,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      },
+      {
+        "expansions": 89403,
+        "path_length": 2,
+        "runtime": 3.585822343826294,
+        "algorithm": "AdaptiveAStar",
+        "path_found": true
+      }
+    ]
+  }
+}
